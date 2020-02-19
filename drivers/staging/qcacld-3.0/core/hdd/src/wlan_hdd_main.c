@@ -10224,6 +10224,15 @@ static int hdd_initialize_mac_address(hdd_context_t *hdd_ctx)
 
 	/* Use fw provided MAC */
 	if (!qdf_is_macaddr_zero(&hdd_ctx->hw_macaddr)) {
+		//For some weird reason the mac address is backwards on SailfishOS, reverse it here
+		uint8_t reversed[QDF_MAC_ADDR_SIZE];
+		uint8_t i;
+		for(i = 0; i < QDF_MAC_ADDR_SIZE; i++) {
+			reversed[i] = hdd_ctx->hw_macaddr.bytes[QDF_MAC_ADDR_SIZE-i-1];
+		}
+		for(i = 0; i < QDF_MAC_ADDR_SIZE; i++) {
+			hdd_ctx->hw_macaddr.bytes[i] = reversed[i];
+		}
 		hdd_update_macaddr(hdd_ctx, hdd_ctx->hw_macaddr, false);
 		update_mac_addr_to_fw = false;
 	} else if (hdd_generate_macaddr_auto(hdd_ctx) != 0) {
